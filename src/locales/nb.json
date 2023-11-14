@@ -1,0 +1,12 @@
+{
+    "main": {
+        "hello": "Hallo verden",
+        "start_over": "Start ny runde",
+        "play": "Spill",
+        "easy": "Lett",
+        "medium": "Middels",
+        "hard": "Vanskelig",
+        "instructions": "Instruksjoner",
+        "create_board": "Lagg til et brett"
+    }
+}

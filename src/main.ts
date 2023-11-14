@@ -19,12 +19,25 @@ import '@ionic/vue/css/text-alignment.css';
 import '@ionic/vue/css/text-transformation.css';
 import '@ionic/vue/css/flex-utils.css';
 import '@ionic/vue/css/display.css';
+import { createI18n } from "vue-i18n";
 
 /* Theme variables */
 import './theme/variables.css';
 
+// import translations
+import en from "./locales/en.json";
+import nb from "./locales/nb.json";
+
+// configure i18n
+const i18n = createI18n({
+  locale: "en",
+  fallbackLocale: "en",
+  messages: { nb, en },
+});
+
 const app = createApp(App)
   .use(IonicVue)
+  .use(i18n)
   .use(router);
   
 router.isReady().then(() => {

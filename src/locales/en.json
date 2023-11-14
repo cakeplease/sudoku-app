@@ -1,0 +1,12 @@
+{
+    "main": {
+        "hello": "Hello World!",
+        "start_over": "Start new round",
+        "play": "Play",
+        "easy": "Easy",
+        "medium": "Medium",
+        "hard": "Hard",
+        "instructions": "Instructions",
+        "create_board": "Create board"
+    }
+}
