@@ -28,7 +28,7 @@ import LanguageSwitch from '@/components/LanguageSwitch.vue';
 .language-switch {
   display: block;
     position: absolute;
-    right: 0;
+    right: 20px;
     top: 20px;
 }
 </style>

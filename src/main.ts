@@ -30,8 +30,8 @@ import nb from "./locales/nb.json";
 
 // configure i18n
 const i18n = createI18n({
-  locale: "en",
-  fallbackLocale: "en",
+  locale: "nb",
+  fallbackLocale: "nb",
   messages: { nb, en },
 });
 

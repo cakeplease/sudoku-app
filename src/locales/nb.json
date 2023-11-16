@@ -7,6 +7,11 @@
         "medium": "Middels",
         "hard": "Vanskelig",
         "instructions": "Instruksjoner",
-        "create_board": "Lagg til et brett"
+        "create_board": "Lagg til et brett",
+        "mark_unmark_number": "Marker/marker bort et tall",
+        "complete_level": "Fullfør nivået",
+        "level": "Nivå",
+        "congrats": "Gratulerer, du har løst denne Sudokuen!",
+        "try_again": "Beklager, det skjer ut som du har noen feil."
     }
 }

@@ -1,11 +1,13 @@
 export class Sudoku {
     constructor() {
         this.board = Array.from({ length: 9 }, () => Array(9).fill(0))
+        this.emptyCellIndices = []
     }
 
     generate(difficulty) {
         this.solve(this.board)
         this.removeNumbers(this.board, difficulty)
+        this.getEmptyCellIndices(this.board)
         return this.board
     }
 
@@ -94,7 +96,7 @@ export class Sudoku {
     chooseDifficulty(difficulty) {
         switch (difficulty) {
             case 'easy':
-                return 20
+                return 1 //TODO change this to 20
             case 'medium':
                 return 30
             case 'hard':
@@ -171,6 +173,28 @@ export class Sudoku {
             return true
         } else {
             return false
+        }
+    }
+
+    isBoardComplete(board) {
+        for (let row = 0; row < 9; row++) {
+            for (let col = 0; col <9; col++) {
+                if (board[row][col] == 0) {
+                    return false
+                }
+            }
+        }
+        return true
+    }
+
+    getEmptyCellIndices(board) {
+        for (let row = 0; row < 9; row++) {
+            for (let col = 0; col < 9; col++) {
+                if (board[row][col] == 0) {
+                    let indices = [row, col]
+                    this.emptyCellIndices.push(indices)
+                }
+            }
         }
     }
 

@@ -7,6 +7,11 @@
         "medium": "Medium",
         "hard": "Hard",
         "instructions": "Instructions",
-        "create_board": "Create board"
+        "create_board": "Create board",
+        "mark_unmark_number": "Mark/unmark number",
+        "complete_level": "Complete level",
+        "level": "Level",
+        "congrats": "Congrats! You completed this sudoku.",
+        "try_again": "Sorry, it seems like you have some errors in your sudoku."
     }
 }
