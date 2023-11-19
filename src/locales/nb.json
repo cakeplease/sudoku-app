@@ -1,7 +1,7 @@
 {
     "main": {
         "hello": "Hallo verden",
-        "start_over": "Start ny runde",
+        "start_new_sudoku": "Start ny sudoku",
         "play": "Spill",
         "easy": "Lett",
         "medium": "Middels",
@@ -12,6 +12,8 @@
         "complete_level": "Fullfør nivået",
         "level": "Nivå",
         "congrats": "Gratulerer, du har løst denne Sudokuen!",
-        "try_again": "Beklager, det skjer ut som du har noen feil."
+        "try_again": "Beklager, det skjer ut som du har noen feil.",
+        "empty_cells": "Tomme celler",
+        "save_board": "Lagre sudokuen"
     }
 }

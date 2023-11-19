@@ -13,7 +13,7 @@
           <ion-label>{{ $t("main.play") }}</ion-label>
         </ion-tab-button>
 
-        <ion-tab-button tab="tab3" href="/tabs/tab3">
+        <ion-tab-button tab="tab3" href="/tabs/create_board">
           <ion-icon aria-hidden="true" :icon="addCircle" />
           <ion-label>{{ $t("main.create_board") }}</ion-label>
         </ion-tab-button>

@@ -21,13 +21,13 @@
     </div>
     
     <div v-if="isGenerated" class="sudoku-wrapper">
-        <ion-button class="start-new-round" href="/tabs/play">{{ $t("main.start_over") }}</ion-button>
+        <ion-button class="start-new-sudoku" href="/tabs/play">{{ $t("main.start_new_sudoku") }}</ion-button>
         <h2>{{ $t("main.level") +': '+ currentLevelDifficulty }}</h2>
         <ion-grid class="ion-no-padding" v-for="(row, rowIndex) in board">
                 <ion-row>
                     <ion-col v-for="(num, colIndex) in row" :key=num>
-                        <ion-input v-if="!isEmptyCell(rowIndex, colIndex)" :value="num"></ion-input>
-                        <ion-input v-else :style="{color: isInFocus}" @input="$event => updateBoard(rowIndex, colIndex, $event.target)" @click="$event => input = $event.target" :value="num === 0 ? '' : num"></ion-input>
+                        <ion-input v-if="!isEmptyCell(rowIndex, colIndex)" :value="num" readonly></ion-input>
+                        <ion-input class="empty-cells" v-else :style="{color: isInFocus }" @input="$event => updateBoard(rowIndex, colIndex, $event.target)" @click="event => onMarkCell(event)" :value="num === 0 ? '' : num"></ion-input>
                     </ion-col>
                     
                 </ion-row>
@@ -63,8 +63,9 @@ import {IonGrid, IonButton, IonInput, IonIcon, IonRow, IonCol} from '@ionic/vue'
 </script>
 <script lang="ts">
 import { Sudoku } from '@/util/Sudoku.js'
-//note to myself:
-//when updating value of cell in board, vue generates new input
+import { useStorageStore } from '@/stores/storage'
+const storage = useStorageStore()
+
 export default {
     components: { IonGrid, IonButton, IonInput, IonIcon, IonRow, IonCol },
     data() {
@@ -79,8 +80,6 @@ export default {
             currentLevelDifficulty: "",
             sudoku: "",
             board: [] as Array<Array<number>>,
-            startBoard: [] as Array<Array<number>>,
-            currentBoard: [] as Array<Array<number>>,
             emptyCellIndices: [],
             victory: false,
             showResults: false,
@@ -91,19 +90,25 @@ export default {
         window: () => window,
     },
     methods: {
-        generateSudokuGrid(difficulty: string) {
+        onMarkCell(event) {
+            this.input = event.target
+            const array = Array.from(document.getElementsByTagName("ion-input"))
+            array.forEach(element => {
+                element.setAttribute('style', 'background-color: transparent')
+            });
+            event.target.closest("ion-input").style = "background-color: rgba(35,35,35,0.4); color: #6dff4a"
+        },
+        async generateSudokuGrid(difficulty: string) {
             this.currentLevelDifficulty = difficulty 
             let sudoku = new Sudoku()
             this.sudoku = sudoku
-
-            let board = this.sudoku.generate(difficulty)
+            let board = await this.sudoku.generate(difficulty)
+    
             this.board = board
             this.emptyCellIndices = this.sudoku.emptyCellIndices
             this.isGenerated = true
         },
         toggleTextColor() {
-                console.log(this.input);
-                
                 if (this.input.getAttribute('data-marked') != "true") {
                     this.input.setAttribute('data-marked', 'true')
                     this.input.style = "color: red"
@@ -122,17 +127,22 @@ export default {
         },
         
         updateBoard(rowIndex, colIndex, target) {
-            this.board[rowIndex][colIndex] = parseInt(target.value) //check if is number
-            this.isBoardComplete()
-            console.log(target);
+             if (target.value !== '') {
+                this.board[rowIndex][colIndex] = parseInt(target.value)
+                this.isBoardComplete()
+            } else {
+                this.board[rowIndex][colIndex] = 0
+            }
         },
         validateBoard() {
             this.showResults = true
-            if (this.sudoku.validateBoard(this.board)) {
-                this.victory = true
+            if (this.sudoku.isBoardComplete(this.board)) { //check first if there are any zeros before validating more precisely
+                if (this.sudoku.validateBoard(this.board)) {
+                    this.victory = true
+                }
             }
-        
         },
+        //TODO skrive om denne funksjonen
         isEmptyCell(row, col) {
             let mainArray = this.emptyCellIndices
 
@@ -172,18 +182,15 @@ export default {
     ion-content ion-grid ion-row ion-col:nth-child(3n) {
         border-right: 3px solid white;
     }
-
     ion-content ion-grid ion-row ion-col:last-child {
         border-right: none;
     }
-
     ion-button, ion-button.start-new-round {
         max-width: 300px;
         margin: 25px auto;
         text-align: right;
         display: block;
     }
-
     .sudoku-wrapper {
         max-width: 500px;
         margin: 0 auto;

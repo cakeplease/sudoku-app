@@ -1,7 +1,7 @@
 {
     "main": {
         "hello": "Hello World!",
-        "start_over": "Start new round",
+        "start_new_sudoku": "Start new sudoku",
         "play": "Play",
         "easy": "Easy",
         "medium": "Medium",
@@ -12,6 +12,10 @@
         "complete_level": "Complete level",
         "level": "Level",
         "congrats": "Congrats! You completed this sudoku.",
-        "try_again": "Sorry, it seems like you have some errors in your sudoku."
+        "try_again": "Sorry, it seems like you have some errors in your sudoku.",
+        "empty_cells": "Empty cells",
+        "save_board": "Save board",
+        "invalid_cell_count": "Invalid empty cell count. Please see the instructions below for more information.",
+        "board_added": "Board added succesfully!"
     }
 }

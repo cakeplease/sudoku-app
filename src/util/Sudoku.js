@@ -1,17 +1,87 @@
+import { useStorageStore } from '@/stores/storage'
+const storage = useStorageStore()
 export class Sudoku {
+    EASY = 5 //TODO change this to 20
+    MEDIUM = 30
+    HARD = 80
+
     constructor() {
         this.board = Array.from({ length: 9 }, () => Array(9).fill(0))
         this.emptyCellIndices = []
     }
 
-    generate(difficulty) {
-        this.solve(this.board)
-        this.removeNumbers(this.board, difficulty)
+    async generate(difficulty) {
+        let sudokus = await storage.get("sudokus")
+        let len
+        let randomIndex
+
+        console.log(sudokus.hard)
+
+        switch (difficulty) {
+            case "easy":
+                len = sudokus.easy.length
+                randomIndex = Math.floor(Math.random() * len) //random sudoku from easy category
+                this.board = JSON.parse(sudokus.easy[randomIndex].puzzle)
+                break;
+            case "medium":
+                len = sudokus.medium.length
+                randomIndex = Math.floor(Math.random() * len) //random sudoku from medium category
+                this.board = JSON.parse(sudokus.medium[randomIndex].puzzle)
+                break;
+            case "hard":
+                len = sudokus.hard.length
+                randomIndex = Math.floor(Math.random() * len) //random sudoku from hard category
+                this.board = JSON.parse(sudokus.hard[randomIndex].puzzle)
+                break;
+            default:
+                len = sudokus.easy.length
+                randomIndex = Math.floor(Math.random() * len) //random sudoku from easy category
+                this.board = JSON.parse(sudokus.easy[randomIndex].puzzle)
+                break;
+        }
+        // this.solve(this.board)
+        // this.removeNumbers(this.board, difficulty)
         this.getEmptyCellIndices(this.board)
         return this.board
     }
 
-    solve = (board) => {
+    //IMPORTANT: I assume that the provided board is solvable and has one unique solution!
+    validateCustomBoard(board) {
+        this.getEmptyCellIndices(board)
+        let emptyCells = this.emptyCellIndices.length
+        switch (emptyCells) {
+            case this.EASY:
+                return "easy"
+            case this.MEDIUM:
+                return "medium"
+            case this.HARD:
+                return "hard"
+            default:
+                throw new Error("Invalid empty cell count. Please see the instructions below for more information.")
+        }
+    }
+
+    async storeBoard(board, difficulty) {
+        let sudokus = await storage.get("sudokus")
+        switch (difficulty) {
+            case "easy":
+                sudokus.easy.push({puzzle: JSON.stringify(board)})
+                break
+            case "medium":
+                sudokus.medium.push({ puzzle: JSON.stringify(board) })
+                break
+            case "hard":
+                sudokus.hard.push({ puzzle: JSON.stringify(board) })
+                break
+            default:
+                throw new Error("Invalid difficulty while storing board.")    
+        }
+        
+        await storage.set("sudokus", sudokus)
+        console.log("Added board to sudokus: ", sudokus)
+    }
+
+    solve(board) {
         for (let row = 0; row < 9; row++) {
             for (let col = 0; col < 9; col++) {
                 if (board[row][col] === 0) {
@@ -36,73 +106,120 @@ export class Sudoku {
     }
 
     // Board must have minimum one empty cell to be solvable
-    findSolutionCount(board) {
-        let solutions = 0
-        for (let row = 0; row < 9; row++) {
-            for (let col = 0; col < 9; col++) {
-                if (board[row][col] === 0) {
-                    for (let num = 1; num <= 9; num++) {
-                        if (isValidMove(board, row, col, num)) {
-                            board[row][col] = num;
-                            solutions += this.findSolutionCount(board);
-                            board[row][col] = 0;
-                        }
-                    }
+    // findSolutionCount(board) {
+    //     let solutions = 0
+
+    //     if (this.isBoardComplete(board)) {
+    //         return 1
+    //     }
+
+    //     for (let row = 0; row < 9; row++) {
+    //         for (let col = 0; col < 9; col++) {
+    //             if (board[row][col] === 0) {
+    //                 for (let num = 1; num <= 9; num++) {
+    //                     if (this.isValidMove(board, row, col, num)) {
+    //                         // Make the move
+    //                         board[row][col] = num;
+
+    //                         // Recursively find solutions
+    //                         solutions += this.findSolutionCount(board);
+
+    //                         board[row][col] = 0;
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+
+    //     // for (let row = 0; row < 9; row++) {
+    //     //     for (let col = 0; col < 9; col++) {
+    //     //         if (board[row][col] === 0) {
+    //     //             for (let num = 1; num <= 9; num++) {
+    //     //                 if (this.isValidMove(board, row, col, num)) {
+    //     //                     board[row][col] = num;
+    //     //                     solutions += this.findSolutionCount(board);
+    //     //                     //board[row][col] = 0;
+    //     //                 }
+    //     //             }
+    //     //         }
+    //     //     }
+    //     // }
+    //     return solutions
+    // }
+
+    // isValidMove(board, row, col, num) {
+    //     for (let i = 0; i < 9; i++) {
+    //         if (num == board[row][i]) {
+    //             return false
+    //         } else if (num == board[i][col]) {
+    //             return false
+    //         //check if the number exists in subgrid
+    //         } else if (num == board[Math.floor(row / 3) * 3 + Math.floor(i / 3)][Math.floor(col / 3) * 3 + i % 3]) {
+    //             return false
+    //         }
+    //     }
+
+    //     return true
+    // }
+    
+    isValidMove(board, row, col, num) {
+        // Check if the number is already in the same row or column
+        for (let i = 0; i < 9; i++) {
+            if (board[row][i] === num || board[i][col] === num) {
+                return false;
+            }
+        }
+
+        // Check if the number is already in the 3x3 subgrid
+        const startRow = 3 * Math.floor(row / 3);
+        const startCol = 3 * Math.floor(col / 3);
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                if (board[startRow + i][startCol + j] === num) {
+                    return false;
                 }
             }
         }
-        return solutions
+
+        // If the number is not present in the same row, column, or subgrid, it's a valid move
+        return true;
     }
 
-    isValidMove = (board, row, col, num) => {
-        for (let i = 0; i < 9; i++) {
-            if (num == board[row][i]) {
-                return false
-            } else if (num == board[i][col]) {
-                return false
-            //check if the number exists in subgrid
-            } else if (num == board[Math.floor(row / 3) * 3 + Math.floor(i / 3)][Math.floor(col / 3) * 3 + i % 3]) {
-                return false
-            }
-        }
+    // removeNumbers(board, difficulty) {
+    //     let numbersToRemove = this.chooseDifficulty(difficulty)
 
-        return true
-    }
+    //     let row; 
+    //     let col; 
 
-    removeNumbers(board, difficulty) {
-        let numbersToRemove = this.chooseDifficulty(difficulty)
-
-        let row; 
-        let col; 
-
-        for (let i = 0; i<numbersToRemove; i++) {
-            do {
-                row = Math.floor(Math.random() * 9) // random number between 0 and 8
-                col = Math.floor(Math.random() * 9)
-            } while (board[row][col] === 0)
+    //     for (let i = 0; i<numbersToRemove; i++) {
+    //         do {
+    //             row = Math.floor(Math.random() * 9) // random number between 0 and 8
+    //             col = Math.floor(Math.random() * 9)
+    //         } while (board[row][col] === 0)
          
-            let currentValue = board[row][col]
+    //         let currentValue = board[row][col]
 
-            board[row][col] = 0
+    //         board[row][col] = 0
 
-            let boardCopy = board.map(row => row.slice())
-            if (!this.solve(boardCopy) || this.findSolutionCount(boardCopy)>1) {
-                board[row][col] = currentValue
-                i--
-            }
-        }
-    }
+    //         let boardCopy = board.map(row => row.slice())
+    //         if (!this.solve(boardCopy) || this.findSolutionCount(boardCopy)>1) {
+    //             board[row][col] = currentValue
+    //             i--
+    //         }
+    //     }
+    // }
+
 
     chooseDifficulty(difficulty) {
         switch (difficulty) {
             case 'easy':
-                return 1 //TODO change this to 20
+                return this.EASY
             case 'medium':
-                return 30
+                return this.MEDIUM
             case 'hard':
-                return 40
+                return this.HARD
             default:
-                return 20
+                return this.EASY
         }
     }
 
@@ -188,6 +305,7 @@ export class Sudoku {
     }
 
     getEmptyCellIndices(board) {
+        this.emptyCellIndices = []
         for (let row = 0; row < 9; row++) {
             for (let col = 0; col < 9; col++) {
                 if (board[row][col] == 0) {

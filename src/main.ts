@@ -1,6 +1,7 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router';
+import { createPinia } from 'pinia'
 
 import { IonicVue } from '@ionic/vue';
 
@@ -27,6 +28,7 @@ import './theme/variables.css';
 // import translations
 import en from "./locales/en.json";
 import nb from "./locales/nb.json";
+import { useStorageStore } from './stores/storage'
 
 // configure i18n
 const i18n = createI18n({
@@ -34,11 +36,16 @@ const i18n = createI18n({
   fallbackLocale: "nb",
   messages: { nb, en },
 });
-
+const pinia = createPinia()
 const app = createApp(App)
   .use(IonicVue)
   .use(i18n)
-  .use(router);
+  .use(router)
+  .use(pinia)
+
+const storage = useStorageStore()
+await storage.loadStore()
+await storage.presetData()
   
 router.isReady().then(() => {
   app.mount('#app');
