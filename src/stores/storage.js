@@ -31,7 +31,7 @@ export const useStorageStore = defineStore('storage', {
         .then(async (sudokus) => {
           let data = await this.get("sudokus")
 
-          if (data == "") {
+          if (data == null) {
             await this.set("sudokus", sudokus)
           }
         })
