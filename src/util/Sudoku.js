@@ -1,9 +1,10 @@
 import { useStorageStore } from '@/stores/storage'
 const storage = useStorageStore()
 export class Sudoku {
-    EASY = 5 //TODO change this to 20
-    MEDIUM = 30
-    HARD = 80
+    //empty cells
+    EASY = 43
+    MEDIUM = 51
+    HARD = 61
 
     constructor() {
         this.board = Array.from({ length: 9 }, () => Array(9).fill(0))
@@ -11,12 +12,10 @@ export class Sudoku {
     }
 
     async generate(difficulty) {
-        let sudokus = await storage.get("sudokus")
+        let sudokus = await storage.get('sudokus')
+        sudokus = JSON.parse(sudokus.value)
         let len
         let randomIndex
-
-        console.log(sudokus.hard)
-
         switch (difficulty) {
             case "easy":
                 len = sudokus.easy.length
@@ -39,13 +38,12 @@ export class Sudoku {
                 this.board = JSON.parse(sudokus.easy[randomIndex].puzzle)
                 break;
         }
-        // this.solve(this.board)
-        // this.removeNumbers(this.board, difficulty)
+        
         this.getEmptyCellIndices(this.board)
         return this.board
     }
 
-    //IMPORTANT: I assume that the provided board is solvable and has one unique solution!
+    //IMPORTANT: I assume that the provided board is solvable and has one unique solution!!!
     validateCustomBoard(board) {
         this.getEmptyCellIndices(board)
         let emptyCells = this.emptyCellIndices.length
@@ -63,6 +61,7 @@ export class Sudoku {
 
     async storeBoard(board, difficulty) {
         let sudokus = await storage.get("sudokus")
+        sudokus = JSON.parse(sudokus.value)
         switch (difficulty) {
             case "easy":
                 sudokus.easy.push({puzzle: JSON.stringify(board)})
@@ -77,8 +76,8 @@ export class Sudoku {
                 throw new Error("Invalid difficulty while storing board.")    
         }
         
-        await storage.set("sudokus", sudokus)
-        console.log("Added board to sudokus: ", sudokus)
+        await storage.set("sudokus", JSON.stringify(sudokus))
+        console.log("Added board to sudokus: ", JSON.stringify(sudokus))
     }
 
     solve(board) {

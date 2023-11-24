@@ -1,5 +1,6 @@
 {
     "main": {
+        "welcome": "Velkommen til Sudoku appen!",
         "hello": "Hallo verden",
         "start_new_sudoku": "Start ny sudoku",
         "play": "Spill",
@@ -14,6 +15,16 @@
         "congrats": "Gratulerer, du har løst denne Sudokuen!",
         "try_again": "Beklager, det skjer ut som du har noen feil.",
         "empty_cells": "Tomme celler",
-        "save_board": "Lagre sudokuen"
+        "save_board": "Lagre sudokuen",
+        "invalid_cell_count": "Ugyldig antall tomme celler. Vennligst se instruksjoner under for mer informasjon.",
+        "board_added": "Brettet har blitt lagt til.",
+        "rules": "Spillet går ut på at et kvadratisk rutenett med 9x9 ruter skal fylles med tallene 1 til 9 slik at alle rader og kolonner inneholder hvert tall bare én gang. Rutenettet er videre oppdelt i ni delkvadrater à 3x3 ruter, og hvert tall skal forekomme bare én gang også i hvert av disse. Spillet er over når alle rutene er fylt med gyldige tall.",
+        "game_instructions": "For å starte spillet, gå til Spill-fanen i menyen nederst på siden og velg vanskelighetsgrad. Brettet blir dermed valgt ut tilfeldig fra alle tilgjengelige brettene. Du kan markere et tall du er usikker på ved å markere cellen med dette tallet, og deretter trykke \"Marker/marker bort et tall\", samme gjelder for å fjerne markeringen. Fyll ut alle cellene og trykk på \"Fullfør nivået\" knappen for å se svaret. Du kan starte et nytt Sudoku spill når som helst ved å trykke på \"Start ny sudoku\" knappen. For å legge til egne brett gå til \"Legg til et brett\"-fanen.",
+        "rules_heading": "Regler for å spille Sudoku",
+        "important": "OBS! Når du vil endre verdien til en celle, fjern først den gamle verdien før du setter inn den nye verdien!",
+        "board_levels": "Startbrett vanskelighetsgrader",
+        "board_level_easy": "Lett: 43 tomme celler",
+        "board_level_medium": "Middels: 51 tomme celler",
+        "board_level_hard": "Vanskelig: 61 tomme celler"
     }
 }

@@ -5,7 +5,6 @@ import { expect, it } from "vitest"
 it("true if board is generated", () => {
     let sudoku = new Sudoku()
     let board = sudoku.generate('easy')
-    console.log(board)
     expect(Array.isArray(board)).toBe(true);
 })
 

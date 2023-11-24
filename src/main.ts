@@ -43,8 +43,8 @@ const app = createApp(App)
   .use(router)
   .use(pinia)
 
+// setup storage and preset data
 const storage = useStorageStore()
-await storage.loadStore()
 await storage.presetData()
   
 router.isReady().then(() => {

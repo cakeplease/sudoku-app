@@ -1,6 +1,6 @@
 {
     "main": {
-        "hello": "Hello World!",
+        "welcome": "Welcome to Sudoku App!",
         "start_new_sudoku": "Start new sudoku",
         "play": "Play",
         "easy": "Easy",
@@ -16,6 +16,14 @@
         "empty_cells": "Empty cells",
         "save_board": "Save board",
         "invalid_cell_count": "Invalid empty cell count. Please see the instructions below for more information.",
-        "board_added": "Board added succesfully!"
+        "board_added": "Board added succesfully!",
+        "rules": "Sudoku grid consists of 9x9 spaces. You can use only numbers from 1 to 9. \nEach 3×3 block can only contain numbers from 1 to 9. \nEach vertical column can only contain number from 1 to 9.\nEach horizontal row can only contain numbers from 1 to 9. \nEach number in the 3×3 block, vertical column or horizontal row can be used only once. \nThe game is over when the whole Sudoku grid is correctly filled with numbers.",
+        "game_instructions": "To start a game, go to Play-tab in the bottom menu and select level of difficulty. A random board from availbale boards will be chosen. You can mark a number you are uncertain of by marking a cell with this number, then clicking on \"Mark/unmark number\", same goes for unmarking. Fill out all cells then press \"Complete level\" button to see the answer. You can start a new game whenever you like by pressing \"Start new sudoku\" button. To create your own boards go to \"Create board\"-tab.",
+        "rules_heading": "Rules for playing Sudoku",
+        "important": "Important! When changing value of a cell, make sure to first remove the old value, before inserting a new value!",
+        "board_levels": "Board difficulty levels",
+        "board_level_easy": "Easy: 43 empty cells",
+        "board_level_medium": "Medium: 51 empty cells",
+        "board_level_hard": "Hard: 61 empty cells"
     }
 }

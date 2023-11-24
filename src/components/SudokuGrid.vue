@@ -1,4 +1,5 @@
 <template>
+    <!-- DIFFICULTY LEVEL BUTTONS -->
     <div v-if="!isGenerated" class="choose-difficulty">
     <ion-button expand="full" @click=generateSudokuGrid(easy)>
             {{ $t("main.easy") }}
@@ -20,51 +21,45 @@
         </ion-button>
     </div>
     
+    
     <div v-if="isGenerated" class="sudoku-wrapper">
-        <ion-button class="start-new-sudoku" href="/tabs/play">{{ $t("main.start_new_sudoku") }}</ion-button>
-        <h2>{{ $t("main.level") +': '+ currentLevelDifficulty }}</h2>
+        <!-- SUDOKU BOARD -->
         <ion-grid class="ion-no-padding" v-for="(row, rowIndex) in board">
                 <ion-row>
                     <ion-col v-for="(num, colIndex) in row" :key=num>
+                        <!-- Predefined number-cells -->
                         <ion-input v-if="!isEmptyCell(rowIndex, colIndex)" :value="num" readonly></ion-input>
-                        <ion-input class="empty-cells" v-else :style="{color: isInFocus }" @input="$event => updateBoard(rowIndex, colIndex, $event.target)" @click="event => onMarkCell(event)" :value="num === 0 ? '' : num"></ion-input>
+                        <!-- Originally empty cells -->
+                        <ion-input v-else type="number" min="1" max="9" class="empty-cells" @keydown="validate($event)" :style="{color: isInFocus }" @input="$event => updateBoard(rowIndex, colIndex, $event)" @click="event => onMarkCell(event)" :value="num === 0 ? '' : num" ></ion-input>
                     </ion-col>
-                    
                 </ion-row>
             </ion-grid>
-        
-        <div>
-            <ion-button expand="full"  class="mark-number" @click="toggleTextColor()" color="warning">{{ $t("main.mark_unmark_number") }}
-                <ion-icon aria-hidden="true" :icon="removeCircle"/>
-            </ion-button>
-            
-            <ion-button expand="full" :disabled="isLackingNumbers" @click="validateBoard()">
-                {{ $t("main.complete_level") }}
-            <ion-icon aria-hidden="true" :icon="trophy"/>
-            </ion-button>
-        </div>
-        <div v-if="showResults" class="result">
-
-            <div v-if="victory">
-                <h2>{{ $t("main.congrats") }}</h2>
+            <p style="text-align: center">{{ $t("main.level") + ': ' + currentLevelDifficulty }}</p>
+            <div class="button-wrapper">
+                
+                <!-- EXTRA BUTTONS -->
+                <!-- Mark-button -->
+                <ion-button class="mark-number" @click="toggleTextColor()" color="warning">{{ $t("main.mark_unmark_number") }}
+                    <ion-icon aria-hidden="true" :icon="removeCircle"/>
+                </ion-button>
+                <!-- Finish level-button -->
+                <ion-button :disabled="isLackingNumbers" @click="validateBoard()">
+                    {{ $t("main.complete_level") }}
+                    <ion-icon aria-hidden="true" :icon="trophy"/>
+                </ion-button>
+                <!-- Start new sudoku-button -->
+                <ion-button class="start-new-sudoku" href="/tabs/play">{{ $t("main.start_new_sudoku") }}</ion-button>
             </div>
-            <div v-else>
-                <h2>{{ $t("main.try_again") }}</h2>
-            </div>
-
-        </div>
     </div>
-   
 </template>
 
 <script setup lang="ts">
 import { star, starOutline, removeCircle, trophy } from 'ionicons/icons'
-import {IonGrid, IonButton, IonInput, IonIcon, IonRow, IonCol} from '@ionic/vue'
+import {IonGrid, IonButton, IonInput, IonIcon, IonRow, IonCol, toastController } from '@ionic/vue'
 </script>
+
 <script lang="ts">
 import { Sudoku } from '@/util/Sudoku.js'
-import { useStorageStore } from '@/stores/storage'
-const storage = useStorageStore()
 
 export default {
     components: { IonGrid, IonButton, IonInput, IonIcon, IonRow, IonCol },
@@ -81,8 +76,6 @@ export default {
             sudoku: "",
             board: [] as Array<Array<number>>,
             emptyCellIndices: [],
-            victory: false,
-            showResults: false,
         }
     },
     computed: {
@@ -90,6 +83,19 @@ export default {
         window: () => window,
     },
     methods: {
+
+        // Validate user inputs
+        //From: https://stackoverflow.com/questions/469357/html-text-input-allow-only-numeric-input
+        validate(event) {
+            var key = event.keyCode || event.which;
+            key = String.fromCharCode(key);
+
+            var regex = /[1-9]|/;
+            if (!regex.test(key)) {
+                event.returnValue = false;
+                if (event.preventDefault) event.preventDefault();
+            }
+        },
         onMarkCell(event) {
             this.input = event.target
             const array = Array.from(document.getElementsByTagName("ion-input"))
@@ -99,7 +105,7 @@ export default {
             event.target.closest("ion-input").style = "background-color: rgba(35,35,35,0.4); color: #6dff4a"
         },
         async generateSudokuGrid(difficulty: string) {
-            this.currentLevelDifficulty = difficulty 
+            this.currentLevelDifficulty = this.$t("main."+ difficulty) 
             let sudoku = new Sudoku()
             this.sudoku = sudoku
             let board = await this.sudoku.generate(difficulty)
@@ -126,21 +132,34 @@ export default {
             }
         },
         
-        updateBoard(rowIndex, colIndex, target) {
-             if (target.value !== '') {
-                this.board[rowIndex][colIndex] = parseInt(target.value)
-                this.isBoardComplete()
-            } else {
-                this.board[rowIndex][colIndex] = 0
+        updateBoard(rowIndex, colIndex, event) {
+            if (event.target.value > 9) {
+               event.target.value = 0
             }
+            if (event.target.value !== '') {
+               this.board[rowIndex][colIndex] = parseInt(event.target.value)
+            } else {
+               this.board[rowIndex][colIndex] = 0
+            }
+            this.isBoardComplete()
         },
         validateBoard() {
-            this.showResults = true
             if (this.sudoku.isBoardComplete(this.board)) { //check first if there are any zeros before validating more precisely
                 if (this.sudoku.validateBoard(this.board)) {
-                    this.victory = true
+                    this.presentToast(this.$t("main.congrats"))
+                } else {
+                    this.presentToast(this.$t("main.try_again"))
                 }
             }
+        },
+        async presentToast(msg) {
+            const toast = await toastController.create({
+                message: msg,
+                duration: 6000,
+                position: 'top',
+            });
+
+            await toast.present();
         },
         //TODO skrive om denne funksjonen
         isEmptyCell(row, col) {
@@ -162,10 +181,12 @@ export default {
 }
 </script>
 <style scoped>
+    .empty-cells {
+        color: #6dff4a
+    }
     ion-col {
         background-color: #135d54;
         border: solid 1px #fff;
-        color: #fff;
         text-align: center;
     }
 
@@ -195,5 +216,8 @@ export default {
         max-width: 500px;
         margin: 0 auto;
     }
+    .button-wrapper {
+        display: block;
+    } 
 
 </style>

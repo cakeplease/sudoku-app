@@ -1,55 +1,26 @@
 import { defineStore } from 'pinia'
-import CordovaSQLiteDriver from 'localforage-cordovasqlitedriver';
-import { Storage, Drivers } from '@ionic/storage';
-
+import { Preferences } from '@capacitor/preferences';
 
 export const useStorageStore = defineStore('storage', {
-  state: () => {
-    return {
-      loaded: false,
-      store: ""
-    }
-  },
   actions: {
-    async loadStore() {
-      if (!this.loaded) {
-        const store = new Storage({
-          driverOrder: [CordovaSQLiteDriver._driver, Drivers.IndexedDB, Drivers.LocalStorage]
-        });
-        await store.defineDriver(CordovaSQLiteDriver);
-        await store.create();
-        this.store = store
-        this.loaded = true
-      }
     
-    },
     async presetData() {
-      this.isLoaded()
+      let sudokus = "{\"easy\":[{\"puzzle\":\"[[0,6,0,3,7,8,0,0,5],[0,0,4,0,0,1,9,2,0],[0,8,5,4,0,0,7,0,3],[0,3,0,0,0,4,0,7,0],[6,4,9,2,0,7,8,0,0],[0,0,7,6,0,0,0,0,0],[2,0,8,7,0,5,0,9,6],[4,0,0,0,0,0,0,5,0],[0,5,3,1,9,0,2,0,0]]\"}],\"medium\":[{\"puzzle\":\"[[0,3,0,5,0,9,0,4,0],[9,0,2,3,1,0,7,0,0],[0,0,0,0,0,6,3,0,0],[0,9,8,6,0,2,0,0,0],[2,4,0,0,0,0,9,0,0],[0,0,0,0,9,8,2,5,0],[0,0,3,0,0,0,0,0,0],[0,0,4,0,0,0,0,3,7],[8,5,9,7,4,3,0,0,0]]\"}],\"hard\":[{\"puzzle\":\"[[0,1,0,7,0,0,0,0,0],[0,0,2,0,0,0,0,7,8],[0,3,4,0,0,0,0,6,1],[0,0,0,0,0,2,9,0,0],[0,0,0,0,3,1,2,5,0],[0,0,0,5,0,0,6,0,0],[9,0,6,0,0,7,0,0,2],[0,7,0,0,0,0,0,0,0],[0,2,8,0,9,0,0,0,0]]\"}]}"
 
-      fetch("./src/data/preset.json")
-        .then((response) => response.json())
-        .then(async (sudokus) => {
-          let data = await this.get("sudokus")
-
-          if (data == null) {
-            await this.set("sudokus", sudokus)
-          }
-        })
-        .catch((e) => console.error(e))
+      let data = await this.get('sudokus')
+      if (data.value == null) {
+        await this.set('sudokus', sudokus)
+      }
     },
-    loadData() {
-
-    },
-    isLoaded() {
-      if (!this.loaded) throw new Error('Storage is not loaded!') 
-    },
-    async get(key, value) {
-      this.isLoaded()
-      return await this.store.get(key, value);
+    async get(key) {
+      return await Preferences.get({ key: key })
+      
     },
     async set(key, value) {
-      this.isLoaded()
-      await this.store.set(key, value);
+      await Preferences.set({ key: key, value: value })
+    },
+    async clear() {
+      await Preferences.clear()
     }
   },
 })

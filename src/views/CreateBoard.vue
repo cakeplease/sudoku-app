@@ -3,6 +3,7 @@
     <ion-header>
       <ion-toolbar>
         <ion-title>{{ $t("main.create_board") }}</ion-title>
+        <LanguageSwitch></LanguageSwitch>
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
@@ -17,18 +18,16 @@
         <ion-grid class="ion-no-padding" v-for="(row, rowIndex) in board">
             <ion-row>
                 <ion-col v-for="(num, colIndex) in row" :key=num>
-                    <ion-input @input="$event => updateBoard(rowIndex, colIndex, $event.target)" :value="num === 0 ? '' : num"></ion-input>
+                    <ion-input @input="$event => updateBoard(rowIndex, colIndex, $event.target)" :value="num === 0 ? '' : num" type="number" @keydown="validate($event)"></ion-input>
                 </ion-col>
             </ion-row>
           </ion-grid>
           <ion-button @click="addBoard()">{{ $t("main.save_board") }}</ion-button>
-          <ion-label v-if="success">{{ $t("main.board_added") }}</ion-label>
-          <ion-label v-if="error">{{ $t("main.invalid_cell_count") }}</ion-label>
-          <ion-title>Board difficulty levels:</ion-title>
+          <ion-title>{{ $t("main.board_levels") }}:</ion-title>
           <ion-list>
-            <ion-item><ion-label>Easy: 20 empty cells</ion-label></ion-item>
-            <ion-item><ion-label>Medium: 30 empty cells</ion-label></ion-item>
-            <ion-item><ion-label>Hard: 40 empty cells</ion-label></ion-item>
+            <ion-item><ion-label>{{ $t("main.board_level_easy") }}</ion-label></ion-item>
+            <ion-item><ion-label>{{ $t("main.board_level_medium") }}</ion-label></ion-item>
+            <ion-item><ion-label>{{ $t("main.board_level_hard") }}</ion-label></ion-item>
           </ion-list>
         </div>
     </ion-content>
@@ -40,9 +39,11 @@ import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonButto
 </script>
 
 <script lang="ts">
-  import { useStorageStore } from '@/stores/storage'
   import { Sudoku } from '@/util/Sudoku'
-  const storage = useStorageStore()
+  import { toastController } from '@ionic/vue'
+  import LanguageSwitch from '@/components/LanguageSwitch.vue';
+
+
   let sudoku = new Sudoku()
   export default {
     data() {
@@ -50,8 +51,6 @@ import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonButto
         feedback: "",
         emptyCells: 81,
         board: sudoku.board as Array<Array<number>>,
-        success: false,
-        error: false,
       }
     },
     computed: {
@@ -59,37 +58,61 @@ import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonButto
       window: () => window,
     },
     methods: {
-      updateBoard(rowIndex, colIndex, target) {
-        if (target.value !== '') {
-          this.board[rowIndex][colIndex] = parseInt(target.value) //check if is number
-        } else {
-          this.board[rowIndex][colIndex] = 0
+       // Validate user inputs
+      //From: https://stackoverflow.com/questions/469357/html-text-input-allow-only-numeric-input
+      validate(event) {
+        var key = event.keyCode || event.which;
+        key = String.fromCharCode(key);
+
+        var regex = /[1-9]|/;
+        if (!regex.test(key)) {
+          event.returnValue = false;
+          if (event.preventDefault) event.preventDefault();
         }
-        
-        sudoku.getEmptyCellIndices(this.board)
-        this.emptyCells = sudoku.emptyCellIndices.length
+      },
+      async presentToast(msg) {
+        const toast = await toastController.create({
+          message: msg,
+          duration: 6000,
+          position: 'top',
+        });
+
+        await toast.present();
+      },
+      updateBoard(rowIndex, colIndex, target) {
+        if (target.value > 9) {
+           target.value = 0
+          }
+          if (target.value !== '') {
+            this.board[rowIndex][colIndex] = parseInt(target.value) //check if is number
+          } else {
+            this.board[rowIndex][colIndex] = 0
+          }
+          
+          sudoku.getEmptyCellIndices(this.board)
+          this.emptyCells = sudoku.emptyCellIndices.length
       },
       async addBoard() {
         try {
          let difficulty = sudoku.validateCustomBoard(this.board)
          await sudoku.storeBoard(this.board, difficulty)
-         this.success = true
+         this.presentToast(this.$t("main.board_added"))
         } catch (error) {
-         this.error = true
-         console.error(error)
+          this.presentToast(this.$t("main.invalid_cell_count"))
+          console.error(error)
         }
       },
-      async set() {
-        storage.set("test", "test")
-      },
-      async get() {
-       storage.get("test")
-      }
     }
   }
 
 </script>
 <style scoped>
+  .language-switch {
+    display: block;
+      position: absolute;
+      right: 20px;
+      top: 20px;
+  }
   .sudoku-wrapper {
     max-width: 500px;
     margin: 0 auto;
