@@ -1,8 +1,16 @@
-Device: Pixel 7 Pro API 33
+-Open project in Android Studio
+For the project I used these:
+Device: Pixel 7 Pro API 33 Tiramisu
 Android version: Android 13
+Java sdk: 17
 
 Commmands to build and run project:
+npm install
 ionic build
+ionic cap add android
+Remember to set ANDROID_HOME to path!
+ionic cap build android
+ionic cap open android or open android folder in Android Studio manually
+Then run app in Android Studio
 
-inoc serve -> webapp in your web browser
-npx cap open android -> in android studio to run on emulator
+ionic serve -> webapp in your web browser
