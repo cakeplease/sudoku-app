@@ -1,0 +1,8 @@
+Device: Pixel 7 Pro API 33
+Android version: Android 13
+
+Commmands to build and run project:
+ionic build
+
+inoc serve -> webapp in your web browser
+npx cap open android -> in android studio to run on emulator

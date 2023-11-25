@@ -13,8 +13,11 @@
         </ion-toolbar>
       </ion-header>
       <div class="sudoku-wrapper">
+
+        <!-- Show empty cell count -->
         <ion-label>{{ $t("main.empty_cells") }}: {{ emptyCells }} </ion-label>
 
+        <!-- Empty board -->
         <ion-grid class="ion-no-padding" v-for="(row, rowIndex) in board">
             <ion-row>
                 <ion-col v-for="(num, colIndex) in row" :key=num>
@@ -22,7 +25,10 @@
                 </ion-col>
             </ion-row>
           </ion-grid>
+          <!-- Add board button -->
           <ion-button @click="addBoard()">{{ $t("main.save_board") }}</ion-button>
+
+          <!-- Instructions -->
           <ion-title>{{ $t("main.board_levels") }}:</ion-title>
           <ion-list>
             <ion-item><ion-label>{{ $t("main.board_level_easy") }}</ion-label></ion-item>
@@ -48,7 +54,6 @@ import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonButto
   export default {
     data() {
       return {
-        feedback: "",
         emptyCells: 81,
         board: sudoku.board as Array<Array<number>>,
       }
@@ -58,7 +63,8 @@ import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonButto
       window: () => window,
     },
     methods: {
-       // Validate user inputs
+
+       // Validate user inputs so only 1-9 are allowed
       //From: https://stackoverflow.com/questions/469357/html-text-input-allow-only-numeric-input
       validate(event) {
         var key = event.keyCode || event.which;
@@ -70,6 +76,8 @@ import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonButto
           if (event.preventDefault) event.preventDefault();
         }
       },
+
+      // Show toast with message
       async presentToast(msg) {
         const toast = await toastController.create({
           message: msg,
@@ -79,6 +87,8 @@ import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonButto
 
         await toast.present();
       },
+
+      // Update board values on cell update
       updateBoard(rowIndex, colIndex, target) {
         if (target.value > 9) {
            target.value = 0
@@ -92,6 +102,7 @@ import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonButto
           sudoku.getEmptyCellIndices(this.board)
           this.emptyCells = sudoku.emptyCellIndices.length
       },
+      // Add board to internal storage with other start boards
       async addBoard() {
         try {
          let difficulty = sudoku.validateCustomBoard(this.board)

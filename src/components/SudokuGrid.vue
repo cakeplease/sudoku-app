@@ -21,7 +21,6 @@
         </ion-button>
     </div>
     
-    
     <div v-if="isGenerated" class="sudoku-wrapper">
         <!-- SUDOKU BOARD -->
         <ion-grid class="ion-no-padding" v-for="(row, rowIndex) in board">
@@ -84,7 +83,7 @@ export default {
     },
     methods: {
 
-        // Validate user inputs
+        // Validate user inputs so only 1-9 are allowed
         //From: https://stackoverflow.com/questions/469357/html-text-input-allow-only-numeric-input
         validate(event) {
             var key = event.keyCode || event.which;
@@ -96,6 +95,8 @@ export default {
                 if (event.preventDefault) event.preventDefault();
             }
         },
+
+        //When cell is clicked add deeper background color and mark this as "input" so we know what cell was clicked last when trying to mark cell later
         onMarkCell(event) {
             this.input = event.target
             const array = Array.from(document.getElementsByTagName("ion-input"))
@@ -104,6 +105,8 @@ export default {
             });
             event.target.closest("ion-input").style = "background-color: rgba(35,35,35,0.4); color: #6dff4a"
         },
+
+        // Get random board from internal storage with specified difficulty
         async generateSudokuGrid(difficulty: string) {
             this.currentLevelDifficulty = this.$t("main."+ difficulty) 
             let sudoku = new Sudoku()
@@ -114,16 +117,19 @@ export default {
             this.emptyCellIndices = this.sudoku.emptyCellIndices
             this.isGenerated = true
         },
+
+        //Mark uncertain number with red
         toggleTextColor() {
-                if (this.input.getAttribute('data-marked') != "true") {
-                    this.input.setAttribute('data-marked', 'true')
-                    this.input.style = "color: red"
-                } else {
-                    this.input.setAttribute('data-marked', 'false')
-                    this.input.style = "color: #6dff4a"
-                }
-            
+            if (this.input.getAttribute('data-marked') != "true") {
+                this.input.setAttribute('data-marked', 'true')
+                this.input.style = "color: red"
+            } else {
+                this.input.setAttribute('data-marked', 'false')
+                this.input.style = "color: #6dff4a"
+            }
         },
+
+        // Check if the board is lacking numbers
         isBoardComplete() {
             if (this.sudoku.isBoardComplete(this.board)) {
                 this.isLackingNumbers = false
@@ -131,7 +137,8 @@ export default {
                 this.isLackingNumbers = true
             }
         },
-        
+
+        // Update board values on cell input change
         updateBoard(rowIndex, colIndex, event) {
             if (event.target.value > 9) {
                event.target.value = 0
@@ -143,6 +150,8 @@ export default {
             }
             this.isBoardComplete()
         },
+
+        // Validate board based on sudoku rules
         validateBoard() {
             if (this.sudoku.isBoardComplete(this.board)) { //check first if there are any zeros before validating more precisely
                 if (this.sudoku.validateBoard(this.board)) {
@@ -152,6 +161,8 @@ export default {
                 }
             }
         },
+
+        // Show toast with message
         async presentToast(msg) {
             const toast = await toastController.create({
                 message: msg,
@@ -161,14 +172,12 @@ export default {
 
             await toast.present();
         },
-        //TODO skrive om denne funksjonen
+
+        // Check for empty cells in the beginning of the game for styling purposes
         isEmptyCell(row, col) {
             let mainArray = this.emptyCellIndices
 
-            // Array to check
             let arrayToCheck = [row, col];
-
-            // Check if the main array includes the array to check
             let includesArray = mainArray.some(subArray =>
                 subArray.length === arrayToCheck.length &&
                 subArray.every((value, index) => value === arrayToCheck[index])

@@ -1,5 +1,5 @@
 <script setup lang="ts"/>
-
+<!-- Language switcher -->
 <template>
   <div class="language-switch">
     <select v-model="$i18n.locale">
