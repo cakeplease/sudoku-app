@@ -9,13 +9,13 @@ For the project I used these:
 
 Device: Pixel 7 Pro API 33 Tiramisu
 
-Android version: Android 13
+Android version: Android 13 (12 funket også på min OnePlus Nord)
 
-Java sdk: 17
+Java sdk: 17! (Jeg har testet java 16 og 21, de funka desverre ikke.)
 
 File->Project Structure->JDK->Android API 33 ->Apply
 
-Commmands to build and run project:
+Commands to build and run project:
 
 npm install
 ionic build
@@ -30,7 +30,7 @@ You can also use: ionic cap open android or open android folder in Android Studi
 
 Then run app in Android Studio with Pixel Pro 7 API 33 device.
 
-I recommend running the application on a physical device for better performence. 
+I recommend running the application on a physical device for better performance. 
 
 Just select your physical device instead of Pixel 7 Pro from the list when using ionic cap build android.
 
